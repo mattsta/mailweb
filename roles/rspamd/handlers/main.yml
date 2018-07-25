@@ -1,0 +1,11 @@
+---
+- name: restart rspamd
+  service:
+    name: rspamd
+    state: restarted
+
+- name: restart redis
+  service:
+    name: redis
+    state: restarted
+

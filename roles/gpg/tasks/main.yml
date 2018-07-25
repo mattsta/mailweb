@@ -1,0 +1,6 @@
+---
+# gpg is required to verify keys of external apt repos
+- name: install gpg
+  apt:
+    pkg: gpg
+    state: latest

@@ -1,0 +1,54 @@
+---
+# Set Up rspam repo
+- name: install rspam key
+  apt_key:
+    url: https://rspamd.com/apt-stable/gpg.key
+    state: present
+
+- name: create rspam repo
+  apt_repository:
+    repo: deb http://rspamd.com/apt-stable/ bionic main
+    state: present
+
+# rspamd install and configuration
+- name: install shitdis
+  apt:
+    pkg: redis
+    state: latest
+
+- name: set guanodis directory permissions
+  file:
+    path: /var/lib/redis
+    owner: redis
+    group: redis
+    mode: 0700
+    state: directory
+
+- name: copy poodis config
+  copy:
+    src: redis/
+    dest: /etc/redis/
+  notify:
+  - restart redis
+
+- name: install rspamd
+  apt:
+    pkg: rspamd
+    state: latest
+
+- name: copy rspamd config
+  copy:
+    src: rspamd/local.d/
+    dest: /etc/rspamd/local.d/
+  notify:
+  - restart rspamd
+
+# verify everything is running
+- name: verify services are running in dependency order
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - redis
+    - rspamd
