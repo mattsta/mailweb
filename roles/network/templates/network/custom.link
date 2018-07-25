@@ -1,0 +1,6 @@
+[Match]
+OriginalName={{ network.ethernets.interface }}
+
+[Link]
+WakeOnLan=off
+MACAddress={{ network.ethernets.macaddress }}

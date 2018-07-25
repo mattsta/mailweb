@@ -1,0 +1,38 @@
+[Match]
+Name={{ network.ethernets.interface }}
+
+#{% for net in network.ethernets.networks %}
+#[Network]
+#Address={{ net.subnet }}
+#{% if net.gateway is defined %}
+#Gateway={{ net.gateway }}
+#{% endif %}
+#
+#{% endfor %}
+
+
+{% for addr in network.ethernets.addresses %}
+[Address]
+Address={{ addr }}
+
+{% endfor %}
+
+{% for net in network.ethernets.networks %}
+[Network]
+Address={{ net.subnet }}
+{% if net.gateway is defined %}
+Gateway={{ net.gateway }}
+{% endif %}
+
+{% endfor %}
+
+
+{% for route in network.ethernets.routes %}
+[Route]
+Destination={{ route.to }}
+Gateway={{ route.via }}
+{% if route['on-link'] %}
+GatewayOnlink=true
+{% endif %}
+
+{% endfor %}

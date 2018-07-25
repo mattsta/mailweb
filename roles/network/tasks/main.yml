@@ -1,0 +1,40 @@
+---
+#- name: plop netplan
+#  copy:
+#    src: "{{ inventory_hostname }}.yaml"
+#    dest: "/etc/netplan/20-customNetworking.yaml"
+#  register: netplanCopy
+#
+#- name: generate netplan
+#  command: netplan generate
+#  register: netplanGenerated
+#  when: netplanCopy.changed
+#
+#- name: apply netplan
+#  command: netplan apply
+#  when: netplanGenerated.changed
+
+- name: configure public network link through systemd directly
+  template:
+    src: network/custom.link
+    dest: "/etc/systemd/network/custom-{{ network.ethernets.interface }}.link"
+  register: networkUpdated
+
+- name: configure public network address through systemd directly
+  template:
+    src: network/custom.network
+    dest: "/etc/systemd/network/custom-{{ network.ethernets.interface }}.network"
+  register: networkUpdated
+
+- name: reload network since configuration changed
+  command: systemctl restart systemd-networkd
+  when: networkUpdated.changed
+
+- name: re-query ansible facts since system changed
+  setup:
+    gather_subset:
+      - "!all"
+      - "!min"
+      - network
+  when: networkUpdated.changed
+
