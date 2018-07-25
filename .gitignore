@@ -1,0 +1,33 @@
+# To prevent people committing private data by mistake,
+# we put private files and vars at the top level directories:
+# /files /group_vars /host_vars
+# ergo, in this public branch, we NEVER commit those directories.
+
+# For private use:
+# - create a new branch
+# - delete those paths from this .gitignore
+# - commit your new private .gitignore to your private branch
+# - then add all private content you need to /files /group_vars /host_vars
+
+# If you need to merge changes from your private branch back to
+# the public repository, use `git cherry-pick` to only apply
+# relevant commits from your private branch back to public
+# instead of merging entire branches (it can help to rebase and
+# flatten commits to individual large logical units before cherry-picking
+# so you don't have to pick out 20 individual commit hashes).
+
+# If you do accidentally commit your private files to the public
+# branch (but haven't pushed to the public yet), use `git rebase -i`
+# to delete the commits containing your private files
+# (or very carefully use `git filter-branch`).
+
+# These conditions _also_ mean you should __never__ combine private
+# files and public role changes in the same commit. Always break up
+# your private additions into isolated commits instead creating atomic
+# "public role changes + private file changes" commit units.
+
+## THUS WE HAVE SPOKEN ##
+
+/files
+/group_vars
+/host_vars
