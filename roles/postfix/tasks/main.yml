@@ -1,0 +1,50 @@
+---
+# postfix install and configuration
+# note: this postfix config requires open ports: 25 and 587
+- name: install postfix
+  apt:
+    state: latest
+    pkg:
+      - postfix
+      - postfix-doc
+      - postfix-pcre
+
+- name: give postfix user permission to read private keys
+  user:
+    name: postfix
+    groups: ssl-cert
+    append: yes
+
+- name: copy postfix config
+  copy:
+    src: postfix/
+    dest: /etc/postfix/
+    mode: preserve
+  notify:
+  - restart postfix # NB this could be a reload instead
+  - rehash postfix aliases
+
+- name: instantiate postfix main.cf template
+  template:
+    src: postfix/main.cf.j2
+    dest: /etc/postfix/main.cf
+  notify:
+  - reload postfix
+
+
+# verify everything is running
+- name: verify services are running in dependency order
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - postfix
+
+- name: reload if certs newish
+  include_role:
+    name: certreload
+  vars:
+    certreload:
+      notifiers:
+        - reload postfix
