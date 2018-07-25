@@ -1,0 +1,13 @@
+- name: create ramdisk directory
+  file:
+    dest: /srv/ramdisk
+    mode: 0755 # TODO: use acl module and bind this to system data user
+    state: directory
+
+- name: mount ramdisk to /srv/ramdisk
+  mount:
+    path: /srv/ramdisk
+    src: tmpfs
+    fstype: tmpfs
+    opts: "lazytime,size={{ ansible_memtotal_mb }}M"
+    state: mounted
