@@ -1,0 +1,21 @@
+---
+# This is a hack because ansible can't trigger handlers if they don't
+# exist, so we can't have our 'certs' role unconditionally fire things
+# like "reload nginx" and "reload postfix" because those don't exist
+# in every deployment.
+# As a hack, just check if /etc/ssl was recently modified then reload
+- name: check certificate update recency
+  stat:
+    path: /etc/ssl
+  register: statSSL
+
+# Have to mock a command resulting in some "changed" status so ansible
+# allows itself to trigger handlers.
+# The actual restriction on this handler is the 'when' clause, not
+# the command itself.
+- name: reload because certs are newish
+  command: /bin/true
+  when: ((ansible_date_time.epoch |int) - (statSSL.stat.mtime |int)) < 300
+  notify:
+    - "{{ item }}"
+  loop: "{{ certreload.notifiers }}"
