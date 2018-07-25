@@ -1,0 +1,153 @@
+---
+- name: remove default ubuntu key
+  file:
+    path: /etc/ssl/private/ssl-cert-snakeoil.key
+    state: absent
+
+- name: create cert maint group
+  group:
+    name: certmaint
+    gid: 1070
+    state: present
+
+- name: create cert maint user
+  user:
+    name: certmaint
+    uid: 1070
+    group: ssl-cert
+    groups:
+      - certmaint
+    shell: /bin/sh
+    create_home: yes
+    state: present
+
+#- name: allow certmaint to maint certs and keys (default)
+#  acl:
+#    path: /etc/ssl/
+#    etype: user
+#    entity: certmaint
+#    permissions: rw
+#    default: yes
+#    recursive: yes
+#    state: present
+#  no_log: true
+
+#- name: allow certmaint to maint certs and keys (actual certs)
+#  acl:
+#    path: /etc/ssl/
+#    etype: user
+#    entity: certmaint
+#    permissions: rwx
+#    state: present
+#  no_log: true
+
+#- name: allow certmaint to maint certs and keys (actual keys)
+#  acl:
+#    path: /etc/ssl/private/
+#    etype: user
+#    entity: certmaint
+#    permissions: rwx
+#    state: present
+#  no_log: true
+
+# Keys are private: only owner can read/write, and only group can read
+- name: populate required keys (common types)
+  copy:
+    src: "tls/private/{{ item[0] }}-key.{{ item[1] }}.pem"
+    dest: /etc/ssl/private/
+    mode: 0640
+    owner: certmaint
+    group: ssl-cert
+  loop: "{{ certs.required |product(certs.keyTypes) |list }}"
+  when: certs.required[0] is string
+
+
+# Certs are owned by 'certmaint' so user 'certmaint' can update them over scp
+# Certs are public (obviously)
+- name: populate required certs (common types)
+  copy:
+    src: "tls/{{ item[0] }}-cert-combined.{{ item[1] }}.pem"
+    dest: /etc/ssl/
+    mode: 0644
+    owner: certmaint
+  loop: "{{ certs.required |product(certs.keyTypes) |list }}"
+  when: certs.required[0] is string
+
+
+
+# Keys are private: only owner can read/write, and only group can read
+- name: populate required keys (specific types)
+  copy:
+    src: "tls/private/{{ item.host }}-key.{{ item.type }}.pem"
+    dest: /etc/ssl/private/
+    mode: 0640
+    owner: certmaint
+    group: ssl-cert
+  loop: "{{ certs.required }}"
+  when: certs.required[0] is mapping
+
+# Certs are owned by 'certmaint' so user 'certmaint' can update them over scp
+# Certs are public (obviously)
+- name: populate required certs (specific types)
+  copy:
+    src: "tls/{{ item.host }}-cert-combined.{{ item.type }}.pem"
+    dest: /etc/ssl/
+    mode: 0644
+    owner: certmaint
+  loop: "{{ certs.required }}"
+  when: certs.required[0] is mapping
+
+
+
+- name: plop LE cert chain
+  copy:
+    src: "tls/lets-encrypt-x3-cross-signed.pem"
+    dest: /etc/ssl/
+    mode: 0644
+    owner: certmaint
+
+- name: plop remote LE challenge redirector
+  copy:
+    src: leforward.py
+    dest: /usr/local/bin/
+    mode: 0755
+  when:
+    - certs.receiver is defined and certs.receiver
+
+
+# Retrieve all users on this host (creates variable 'passwd' containing results)
+- name: get all user details so we can populate home directories
+  getent:
+    database: passwd
+
+# Copy users/hostname/username contents into remote home directory
+- name: verify explicit user keys exist as expected
+  copy:
+    src: "users/{{ inventory_hostname }}/{{ item }}/"
+    # [item][4] is [username][homedir] where /etc/passwd is tokenized on ':'
+    # and username becomes the key with remaining fields indexed by integers
+    dest: "{{ getent_passwd[item][4] }}"
+    mode: 0600
+    owner: "{{ item }}"
+    directory_mode: 0700
+  loop: "{{ certs.sshKeysForUsers }}"
+
+# TODO: we could make one key per action then restrict actions by ssh key.
+#  (postfix key, dovecot key, nginx key, leforward key)
+- name: verify certmaint receiver key exists
+  copy:
+    src: "users/certmaint/"
+    dest: "{{ getent_passwd[item][4] }}"
+    mode: 0600
+    owner: "{{ item }}"
+    directory_mode: 0700
+  loop:
+    - certmaint
+
+- name: allow certmaint group to sudo reload relevant services
+  lineinfile:
+    path: /etc/sudoers.d/certmaint_reloads
+    regexp: "^%certmaint"
+    line: "%certmaint ALL = (root) NOPASSWD: /usr/sbin/service postfix reload, /usr/sbin/service dovecot reload, /usr/sbin/service nginx reload"
+    create: yes
+    mode: 0440
