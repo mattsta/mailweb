@@ -1,0 +1,36 @@
+location:
+    # List of source directories to backup. Globs are expanded.
+    source_directories:
+{% for dir in backup.dirs %}
+        - {{ dir }}
+{% endfor %}
+
+    # Paths to local or remote repositories.
+    repositories:
+        - {{ backup.host }}:{{ inventory_hostname }}
+
+    one_file_system: True
+    remote_path: borg1
+
+    # Any paths matching these patterns are excluded from backups.
+    exclude_patterns:
+        - /home/*/.cache
+
+storage:
+    encryption_passphrase: {{ backup.phrase }}
+    compression: lz4
+
+retention:
+    # Retention policy for how many backups to keep in each category.
+    keep_within: 3H
+    keep_daily: 7
+    keep_weekly: 2
+    keep_monthly: 3
+
+consistency:
+    # List of consistency checks to run: "repository", "archives", or both.
+    checks:
+        - repository
+        - archives
+
+    check_last: 1

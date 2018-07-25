@@ -1,0 +1,4 @@
+---
+dependencies:
+  # borgmatic is inside a pip3 package
+  - role: pip3

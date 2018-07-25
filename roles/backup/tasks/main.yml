@@ -1,0 +1,40 @@
+---
+- name: install borgbackup
+  apt:
+    pkg: borgbackup
+    state: latest
+
+- name: install borgmatic
+  pip:
+    name: borgmatic
+    state: latest
+
+- name: create backup config dir
+  file:
+    path: /etc/borgmatic.d
+    owner: "{{ backup.runAs }}"
+    mode: 0700
+    state: directory
+
+# Create backup config for entire server
+# Ideally we only have one type of data to backup per server and the rest
+# can be re-constructed as necessary through auto-deploy processes
+- name: populate borgmatic config with details for hosts
+  template:
+    src: borgmatic.yml.j2
+    dest: /etc/borgmatic.d/system.backup.yml
+    owner: "{{ backup.runAs }}"
+    mode: 0600
+
+# Note: right now we aren't populating an 'excludes' file
+# If we need 'excludes' in the future, append '--excludes [excludesDirsFile]'
+# ALSO NOTE: your backup.runAs user MUST MANUALLY ACCEPT THE BACKUP HOST SSH KEY
+# Backup will stall if unattended ssh sees new host fingerprint needing approval
+- name: install backup crontab
+  cron:
+    name: "Backup Offsite"
+    minute: 32
+    hour: 3
+    job: "borgmatic --verbosity 1 -c /etc/borgmatic.d/system.backup.yml"
+    user: "{{ backup.runAs }}"
+    cron_file: backup_offsite
