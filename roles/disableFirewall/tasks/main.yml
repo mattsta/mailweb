@@ -1,0 +1,22 @@
+---
+# Our mail systems only listen to SMTP(S) and IMAP(S)
+# so we can disable all firewalls
+# This stops ufw, then uninstalls ufw and iptables (and ip6tables)
+- name: remove firewall
+  apt:
+    name: iptables
+    state: absent
+  register: firewallKaboom
+
+# removing iptables doesn't actually stop iptables processing,
+# so let's force remove all packet processing from the kernel itself here
+# TODO: this conditional could be better. would be nice if we had a fact
+#       of loaded kernel modules to query the presence/absence of
+- name: unload firewall
+  command: modprobe -r ip6table_filter iptable_filter ip6_tables ip_tables x_tables
+  when: firewallKaboom.changed
+
+- name: disable iptables from reappearing in the future
+  copy:
+    src: modprobe.d/
+    dest: /etc/modprobe.d/
