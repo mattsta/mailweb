@@ -1,0 +1,31 @@
+---
+- name: restart dovecot
+  service:
+    name: dovecot
+    state: restarted
+
+- name: reload dovecot
+  service:
+    name: dovecot
+    state: reloaded
+
+# We intentionally don't have a "creates:" guard on the resieve handlers
+# because if they get called we need to re-run them on any changes of
+# the underlying script itself regardless whether the result .svbin
+# already exists or not.
+- name: resieve spam
+  command: sievec report-spam.sieve
+  args:
+    chdir: /etc/dovecot/sieve
+
+- name: resieve ham
+  command: sievec report-ham.sieve
+  args:
+    chdir: /etc/dovecot/sieve
+
+- name: resieve spam mover
+  command: sievec 10-rspamd.sieve
+  args:
+    chdir: /etc/dovecot/sieve-before.d
+    creates: 10-rspamd.svbin
+

@@ -1,0 +1,22 @@
+# require SSL for all non-localhost connections
+ssl = required
+
+# Config detials at https://wiki.dovecot.org/SSL/DovecotConfiguration
+ssl_cert = </etc/ssl/{{ network.hostname.public }}-cert-combined.rsa2048.pem
+ssl_key = </etc/ssl/private/{{ network.hostname.public }}-key.rsa2048.pem
+
+# Since v2.2.31+ you can specify alternative ssl certificate
+# if the algorithm differs from the primary certificate.
+# This is useful when migrating to e.g. ECDSA certificate.
+ssl_alt_cert = </etc/ssl/{{ network.hostname.public }}-cert-combined.prime256v1.pem
+ssl_alt_key = </etc/ssl/private/{{ network.hostname.public }}-key.prime256v1.pem
+
+# require modern crypto - taken from Mozilla's SSL recommendations page
+ssl_dh_parameters_length = 4096
+ssl_protocols = !SSLv3 !TLSv1 !TLSv1.1 TLSv1.2
+ssl_cipher_list = ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256
+ssl_prefer_server_ciphers = yes
+
+# newer dovecot 2.3+
+#ssl_min_protocol = TLSv1.2
+#ssl_dh = /etc/ssl/ffdhe4096.pem

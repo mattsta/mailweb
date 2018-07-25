@@ -1,0 +1,110 @@
+---
+# dovecot install and configuration
+- name: install dovecot
+  apt:
+    state: latest
+    pkg:
+      - dovecot-imapd
+      - dovecot-lmtpd
+      - dovecot-sieve
+      - dovecot-sqlite
+
+# Convert existing maildir to mdbox (local on-fs dirs) with:
+# dsync -o mail_location=mdbox:herebox mirror maildir:Maildir
+# Or, you can pull from a remote site:
+# Below, -R means REVERSE backup so PULL messages FROM vorash INTO mdbox,
+# otherwise, it's a PUSH backup and mdbox PUSHES to vorash which isn't what we want
+# doveadm -o mail_location=mdbox:herebox backup -R ssh -J matt@novus.webdev.bz matt@vorash doveadm dsync-server
+- name: create mail spool dirs
+  file:
+    path: /var/mail/local
+    owner: root
+    group: mail
+    mode: 0775
+    state: directory
+
+- name: create dovecot virtual mailbox group
+  group:
+    name: vmail
+    gid: 145
+    state: present
+
+- name: create dovecot virtual mailbox and virtual authentication account
+  user:
+    name: vmail
+    uid: 145
+    group: vmail
+    shell: /sbin/nologin
+    create_home: yes
+    home: /var/mail/vhosts
+    state: present
+
+- name: give dovecot user permission to read private keys
+  user:
+    name: dovecot
+    groups: ssl-cert
+    append: yes
+
+# Create new passwords with:
+# time doveadm pw -s SHA512-CRYPT -r 1856250
+- name: copy dovecot configs and userdb
+  copy:
+    src: dovecot/
+    dest: /etc/dovecot/
+    mode: preserve
+  notify:
+  - resieve spam
+  - resieve ham
+  - resieve spam mover
+  - restart dovecot
+
+# This permission is important because dovecot has multiple users:
+# - dovecot
+# - dovenull
+# - vmail
+# but login processes are run by the 'vmail' user, so 'vmail' must have read
+# access to the DB
+- name: fix user permissions on authdb
+  file:
+    path: /etc/dovecot/authdb.sqlite
+    owner: vmail
+    group: vmail
+    mode: 0600
+
+- name: instantiate dovecot SSL template with host vars
+  template:
+    src: dovecot/conf.d/10-ssl.conf.j2
+    dest: /etc/dovecot/conf.d/10-ssl.conf
+  notify:
+  - restart dovecot # NB this could be a reload instead
+
+# Dovecot mdbox format requires a purge to remove storage space
+# allocated to messages that have been fully deleted by users.
+# (it's an append-only refcounting system, so when a refcount becomes
+#  zero on final delete, it needs some cleanup to rewrite the old
+#  pack files without the deleted emails present anymore.)
+- cron:
+    name: setup cron so dovecot can GC mailboxes
+    minute: 0
+    hour: 3
+    user: vmail
+    job: "doveadm purge -A"
+    cron_file: dovecot_maint_purge
+
+
+# verify everything is running
+- name: verify services are running in dependency order
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - dovecot
+
+- name: reload if certs newish
+  include_role:
+    name: certreload
+  vars:
+    certreload:
+      notifiers:
+        - reload dovecot
