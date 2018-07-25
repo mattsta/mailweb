@@ -1,0 +1,9 @@
+---
+sieve:
+  users:
+    # username field is the filename [username].sieve in files/
+    # The sieve file gets stored in vmail user directory [domain]/[user]/sieve/
+    # We could improve this because it's clearly redundant...
+    - username: username@server.com
+      domain: server.com
+      user: username

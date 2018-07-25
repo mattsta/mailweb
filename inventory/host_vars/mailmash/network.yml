@@ -1,0 +1,37 @@
+---
+network:
+  # These interface names are used to pull IP addresses into templates.
+  # interface.public has the IP we use to open ports to the world (mail, web, etc)
+  # interface.private has the IP for private services (ssh login, reporting, etc)
+  # Right now we don't support multiple IPs per interface, we just grab the IPv4
+  # address as presented by ansible fact e.g. 'ansible_{{interface.public}}.ipv4.address'
+  interface:
+    private: ens3
+    public: ens4
+  hostname:
+    # network.hostname.public is used populate templates with
+    # server's public hostname, including:
+    #   - TLS certs to use with this pattern:
+    #     /etc/ssl/[hostname]-cert-combined.pem
+    #     /etc/ssl/[hostname]-key.pem
+    #   - Postfix config parameter "myhostname"
+    public: yourmail.server.com
+
+  # Below is almost (almost!) the netplan schema with three changes:
+  # - only one "interface" per system because ansible can't seem to generate multiple
+  #   templates from one yaml dict?
+  # - so, the 'interface' key is added, other wise it would just be ethernets: ens4: ...
+  # - also, 'addresses' needs per-address broadcast, so addresses are now lists
+  #   of dicts, so 'ip' is a new name as is 'broadcast'
+  ethernets:
+      interface: ens4
+      macaddress: 02:00:00:7d:ca:ab
+      networks:
+        - subnet: 4.4.4.0/30
+          gateway: 5.5.5.5
+      addresses:
+        - 4.4.4.4/32
+      routes:
+        - to: 0.0.0.0/0
+          via: 5.5.5.5
+          on-link: true

@@ -1,0 +1,18 @@
+---
+backup:
+  # Define a host in your ~/.ssh/config with username, host, and private key.
+  # Maintaining your ~/.ssh/config is out of scope for our implementation here.
+  host: rsn-backup
+
+  # directories to backup can be amended at any time
+  dirs:
+    - /var/mail
+    - /var/lib/fail2ban
+    - /var/lib/redis
+
+  # phrase is from: borg init --remote-path=borg1 --encryption=repokey-blake2 rsn-backup:mailmash
+  phrase: your phrase goes here
+
+  # your runAs user should be able to ssh to the backup host without a password
+  # (remote login user is configured by Host->User in this user's ~/.ssh/config)
+  runAs: root
