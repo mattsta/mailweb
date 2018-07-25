@@ -1,0 +1,15 @@
+---
+- hosts: mail
+  remote_user: ansiblerunnerofthings
+  become: yes
+  roles:
+    - common
+    - certs
+    - network
+    - disableFirewall
+    - rspamd
+    - dovecot
+    - sieve
+    - postfix
+    - fail2ban
+    - backup
