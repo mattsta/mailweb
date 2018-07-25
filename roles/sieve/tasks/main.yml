@@ -1,0 +1,20 @@
+---
+- name: copy user sieves to user vmail homedirs
+  copy:
+    src: "sieve/{{ item.username }}.sieve"
+    dest: "/var/mail/vhosts/{{item.domain}}/{{item.user}}/sieve/"
+    mode: 0600
+    owner: vmail
+    group: vmail
+  loop: "{{ sieve.users }}"
+
+  # dovecot only reads .dovecot.sieve symlink in each users's virtual homedir
+- name: create active sieve symlinks for dovecot users
+  file:
+    state: link
+    src: "/var/mail/vhosts/{{item.domain}}/{{item.user}}/sieve/{{ item.username }}.sieve"
+    dest: "/var/mail/vhosts/{{item.domain}}/{{item.user}}/.dovecot.sieve"
+    owner: vmail
+    group: vmail
+    force: yes
+  loop: "{{ sieve.users }}"
