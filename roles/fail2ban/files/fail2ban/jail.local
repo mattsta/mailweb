@@ -1,0 +1,59 @@
+[DEFAULT]
+# For 'banaction' you can use any action defined in /etc/fail2ban/action.d/
+# including things like iptables, iptables-ipset, nftables-*, ...
+banaction = hostsdeny
+banaction_allports = hostsdeny
+
+# Blocking decision making is fully logged in /var/log/fail2ban.log
+# Current blocking can be viewed with:
+# fail2ban-client status
+# fail2ban-client status [service]
+
+# You can unban IPs with
+# fail2ban-client unban <ip>...
+#
+# Or unban just for one service/jail
+# fail2ban-client set <jail> unban <ip>
+
+# Go away for a long time
+bantime  = 34d
+
+
+# DEBUGGING
+# You can debug fail2ban behavior by running it in the foreground with
+# client debug and server debug logging:
+# fail2ban-client -vvvvvvvvvv --loglevel DEBUG -f -x start
+# In another terminal:
+# tail -F /var/log/fail2ban.log
+#
+# It helps to delete the persistent save db before fail2ban is started
+# in debug mode too:
+# rm /var/lib/fail2ban/fail2ban.sqlite3
+
+
+# And we're always watching
+# If you're testing/debugging your auth and failing your own logins
+# either by mistake or intentionally, you'll want to either decrease
+# the findtime, decrease the bantime, increase the maxretry time,
+# or just disable fail2ban for [findtime] after your testing.
+findtime = 6h
+
+# Quick and done
+maxretry = 5
+
+[sshd]
+# Disable sshd since we don't have public ssh access to these servers
+enabled = false
+
+[postfix]
+enabled = true
+mode = aggressive
+findtime = 7d # watch out for bad long-term trickle tricksters
+
+[postfix-rspamd]
+enabled = true
+findtime = 7d
+maxretry = 3
+
+[dovecot]
+enabled = true

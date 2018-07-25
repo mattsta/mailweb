@@ -1,0 +1,28 @@
+---
+# dovecot is configured to respect the fail2ban deny decisions
+# A failed login is recorded as:
+# dovecot[<pid>]: imap-login: access(tcpwrap): Client refused (rip=<ip>)
+- name: install fail2ban
+  apt:
+    name: fail2ban
+    state: latest
+    install_recommends: false
+
+- name: copy fail2ban config
+  copy:
+    src: fail2ban/
+    dest: /etc/fail2ban/
+    mode: preserve
+  notify:
+  - restart fail2ban
+
+
+# verify everything is running
+- name: verify services are running in dependency order
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - fail2ban
+
