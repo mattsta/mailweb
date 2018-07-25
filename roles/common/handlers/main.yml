@@ -1,0 +1,20 @@
+---
+- name: reload sshd
+  service:
+    name: sshd
+    state: reloaded
+
+- name: reload grub
+  command: update-grub
+
+- name: double disable systemd ntp client
+  command: timedatectl set-ntp false
+
+- name: clear motd cache
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /var/cache/motd-news
+    - /run/motd.dynamic
+    - /run/motd.dynamic.new

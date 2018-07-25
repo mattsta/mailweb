@@ -1,0 +1,25 @@
+set encoding=utf-8
+
+set ignorecase
+set smartcase
+
+set title
+
+set backupdir=~/.vim-tmp,/tmp
+set directory=~/.vim-tmp,/tmp
+
+set ruler
+
+filetype plugin indent on
+
+set ai
+set expandtab
+set tabstop=4
+set shiftwidth=4
+
+autocmd BufEnter * :syntax sync fromstart
+
+set hlsearch
+colorscheme peachpuff
+
+set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.o,*.dSYM,tags

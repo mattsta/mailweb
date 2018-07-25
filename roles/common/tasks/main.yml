@@ -1,0 +1,301 @@
+---
+# You can manually view how your OS-provided packages are supported with:
+# ubuntu-support-status --show-all
+- name: update packages
+  apt:
+    update_cache: yes
+    upgrade: safe
+    cache_valid_time: 3600
+
+
+- name: fix inputrc
+  copy:
+    src: inputrc
+    dest: /etc/inputrc
+    owner: root
+    group: root
+    mode: 0644
+
+- name: fix vimrc
+  copy:
+    src: vimrc.local
+    dest: /etc/vim/
+    owner: root
+    group: root
+    mode: 0644
+
+
+- include_role:
+    name: ramdisk
+
+
+- name: remove ubuntu call home reporting cron
+  cron:
+    cron_file: popularity-contest
+    state: absent
+
+
+- name: remove low port restriction
+  sysctl:
+    name: net.ipv4.ip_unprivileged_port_start
+    value: 0
+    state: present
+    sysctl_set: yes
+
+
+# 3 means enable for outgoing and incoming connections
+# 2 means enable for incoming connections
+# 1 means enable for outgoing connections
+# 0 means disabled
+# Linux 3.13 (2014-01-19) and newer
+- name: enable server and client TCP_FASTOPEN
+  sysctl:
+    name: net.ipv4.tcp_fastopen
+    value: 3
+    state: present
+    sysctl_set: yes
+
+
+# These were taken from:
+# https://wiki.mozilla.org/Security/Server_Side_TLS#Pre-defined_DHE_groups
+- name: populate known-good dhparams
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/ssl/{{ item }}"
+  loop:
+    - ffdhe2048.pem
+    - ffdhe3072.pem
+    - ffdhe4096.pem
+
+
+- name: configure /etc/hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+    #- name: Add IP address of all hosts to all hosts
+    #  lineinfile:
+    #    state: present
+    #    dest: /etc/hosts
+    #    regexp: '.*{{ item }}$'
+    #    line: "{{ hostvars[item].ansible_default_ipv4.address }} {{item}}"
+    #  when: hostvars[item].ansible_default_ipv4.address is defined
+    #  with_items: "{{ groups['all'] }}"
+
+
+- name: configure sshd to only listen on IPv4
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^#?AddressFamily'
+    line: "AddressFamily inet" # no ipv6
+    state: present
+  notify: reload sshd
+
+
+  # Capture example:
+  #- replace:
+  #    path: /etc/hosts
+  #    regexp: '(\s+)old\.host\.name(\s+.*)?$'
+  #    replace: '\1new.host.name\2'
+  #    backup: yes
+
+
+- name: fix motd
+  replace:
+    path: /etc/default/motd-news
+    regexp: 'https://motd.ubuntu.com'
+    replace: 'https://matt.sh/motd'
+  notify:
+    - clear motd cache
+
+
+# Verify against:
+# systemctl list-timers
+- name: disable more automated call home reporting
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: False
+  loop:
+    - apt-daily-upgrade.timer
+    - apt-daily.timer
+    - motd-news.timer
+
+
+- name: remove ubuntu self-advertising
+  file:
+    path: "/etc/update-motd.d/{{ item }}"
+    state: absent
+  loop:
+    - 91-release-upgrade
+    - 80-livepatch
+    - 10-help-text
+  notify:
+    - clear motd cache
+
+
+# Ubuntu's pam_motd.so shows you /etc/legal
+# on login if you don't have ~/.cache/motd.legal-displayed
+# There is no way to disable the creation of that file in ~/.cache on login,
+# but we can wipe out the message for new users.
+- name: remove login disclaimer
+  file:
+    path: /etc/legal
+    state: absent
+
+
+- name: place net-listeners.py
+  copy:
+    src: net-listeners.py
+    dest: /usr/local/bin/
+    owner: root
+    group: root
+    mode: 0755
+
+- name: place scp/rsync-only ssh restriction capability
+  copy:
+    src: ssh-transfer-only.sh
+    dest: /usr/local/bin/
+    owner: root
+    group: root
+    mode: 0755
+
+# can't setsid 04755 scripts, so enable script with global passwordless sudo
+- name: enable all user running of net-listeners.py
+  lineinfile:
+    path: /etc/sudoers.d/net-listeners
+    regexp: "listeners.py"
+    line: "ALL ALL = (root) NOPASSWD: /usr/local/bin/net-listeners.py"
+    create: yes
+    mode: 0440
+
+- name: add uptime and uname to login motd
+  lineinfile:
+    dest: /etc/update-motd.d/00-header
+    line: "{{ item }}"
+    state: present
+  loop:
+    - printf "\n$(w -us)\n"
+
+- name: add listening watcher to global login config
+  lineinfile:
+    dest: /etc/bash.bashrc
+    line: "{{ item }}"
+    state: present
+  loop:
+    # Only show output when running a login, not when starting a sudo shell
+    - "[[ -z $SUDO_UID ]] && sudo /usr/local/bin/net-listeners.py"
+
+- name: ensure system grub template has serial access
+  lineinfile:
+    dest: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX='
+    line: 'GRUB_CMDLINE_LINUX="console=ttyS0 {{ grub.extras }}"'
+    state: present
+  notify: reload grub
+
+
+# This is an ops opinion. For more advanced needs, modify here or just template
+# the entire sshd_config directly.
+- name: configure sshd to only listen on local IP
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^#?ListenAddress'
+    line: "ListenAddress {{ hostvars[inventory_hostname]['ansible_' + network.interface.private]['ipv4']['address'] }}"
+    state: present
+  notify: reload sshd
+
+
+- name: install system tools
+  apt:
+    pkg:
+      # acl is required for ansible to "become_user" as someone non-root because
+      # of permissions on its temporary files. Ansible will setfacl on temp files
+      # so it doesn't have to 0666 everything just so a new user can modify things.
+      - acl
+
+      # you aren't a linux server without sending nightly summary emails
+      - logwatch
+
+      # apt helpers for repo installs not included by default for some reason
+      - software-properties-common
+
+      # production CA bundles so we don't get unknown CA errors
+      - ca-certificates
+
+      # Maintains high numbers in /proc/sys/kernel/random/entropy_avail
+      - rng-tools
+
+      # should we use a more modern thing than collect? distributed osquery?
+      - collectd
+
+      # make sure 'install_recommends: no' or this installs lots of other stuff
+      - vim-nox
+
+      # rrdtool only installed so we can be lazy and generate graphs on-demand
+      # with: /usr/share/doc/collectd-core/examples/collectd2html.pl
+      # TODO: enable centralized reporting system
+      - rrdtool
+
+      # netstat, mii-tool, etc
+      - net-tools
+    install_recommends: no
+    state: latest
+
+# use a modern ntp client+server.
+#
+# systemd actually has a built-in ntp client called 'systemd-timesyncd'
+# You can view its status with:
+# journalctl -u systemd-timesyncd
+# timedatectl
+#
+# Installing chrony will disable systemd-timesyncd
+# (represented in apt with "Replaces: time-daemon")
+# but it doesn't _actually_ disable it according to timedatectl (bug?)
+# so we also manually run 'timedatectl set-ntp false' just to confirm.
+# A good writeup about systemd-timesyncd lives at:
+# https://wiki.archlinux.org/index.php/systemd-timesyncd
+#
+# You can view your live chrony status with:
+# chronyc tracking
+# chronyc sources
+# chronyc sourcestats
+#
+# ...and that's a lot more detail than the built-in garabage systemd-timesyncd
+# client will tell you about how your system time is being managed.
+#
+# chrony is both an ntp client with a remote administration interface
+# and an ntp server, but by default chrony does not enable remote admin
+# or ntp serving without additional explicit configuration (chrony.conf).
+#
+# For more details about becoming an ntp server and remote time administartion,
+# see sections 2.2 and 2.5 of:
+# https://chrony.tuxfamily.org/faq.html#_how_do_i_make_an_ntp_server_from_an_ntp_client
+- name: install ntp client
+  apt:
+    pkg: chrony
+    state: latest
+  notify:
+    - double disable systemd ntp client
+
+# If ansible facts aren't enough, we can get puppet and chef facts too:
+#- name: install facter
+#  apt:
+#    pkg: facter
+#    state: latest
+#
+#- name: install ohai
+#  apt:
+#    pkg: facter
+#    state: latest
+
+
+# cleanup
+- name: cleanup packaging
+  apt:
+    autoclean: yes
+    autoremove: yes
+
+# If needed, build and provide:
+#
+# Build for nsjail:
+# apt install protobu* bison flex pkg-config libprotobuf-dev
