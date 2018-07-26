@@ -1,5 +1,5 @@
-mailweb: Matt's Mail Server Ansible Config
-==========================================
+mailweb: Matt's Mail and Web Ansible Config
+===========================================
 
 ## What Is It?
 
@@ -12,7 +12,9 @@ my personal mail infrastructure components including:
 - borg-backup
 - fail2ban
 
-It was created to apply on modern Ubuntu servers with a current
+Also includes web components for installing multi-site `nginx` servers.
+
+`mailweb` was created to apply on modern Ubuntu servers with a current
 release version of Bionic 18.04 LTS (meaning: packages are deployed using
 the `apt` module only currently).
 
@@ -61,3 +63,4 @@ Hopefully we can keep this architecture alive as its package components and unde
     - cross-OS package management (`if centos` vs. `if debian` etc)
         - should include better version checking/version pinning so we don't try to load 2018 configs into older servers not supporting modern options
     - cross-OS config file locations, handlers, etc
+- Update config files when [newer standards or features](https://matt.sh/web2018) get implemented and released
