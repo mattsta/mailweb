@@ -1,2 +1,5 @@
 [mail]
 mailmash ansible_python_interpreter=/usr/bin/python3
+
+[web]
+webby ansible_python_interpreter=/usr/bin/python3

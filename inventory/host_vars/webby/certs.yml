@@ -1,0 +1,23 @@
+---
+certs:
+  # Copy only these private keys and certs from ansible into the system
+  keyTypes:
+    - rsa2048
+    - prime256v1
+
+# requested can EITHER be:
+# - just a list of hostnames (then we depoly all 'keyTypes' for each hostname)
+# - or, a mapping of, e.g.:
+#   - host: example1.com
+#     type: rsa2048
+#   - host: example1.com
+#     type: prime256v1
+  required:
+    - example1.com
+    - example2.com
+    - example3.com
+
+  # These users have ansible-controlled ssh private keys
+  # (mainly for automated backups right now)
+  sshKeysForUsers: []
+  #  - root

@@ -1,0 +1,12 @@
+---
+network:
+  # These interface names are used to pull IP addresses into templates.
+  # interface.public has the IP we use to open ports to the world (mail, web, etc)
+  # interface.private has the IP for private services (ssh login, reporting, etc)
+  # Right now we don't support multiple IPs per interface, we just grab the IPv4
+  # address as presented by ansible fact e.g. 'ansible_{{interface.public}}.ipv4.address'
+  interface:
+    private: ens3
+    public: ens4
+  hostname:
+    public: webby

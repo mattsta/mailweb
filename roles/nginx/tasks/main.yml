@@ -1,0 +1,118 @@
+---
+- name: emerge, nginx with extra modules!
+  apt:
+    pkg: nginx-extras
+    state: latest
+
+# Keep 32 logs
+- name: adjust nginx logrotate keep files
+  lineinfile:
+    state: present
+    path: /etc/logrotate.d/nginx
+    regexp: "^(\\s+)rotate "
+    line: "\\1rotate 32"
+    backrefs: yes
+
+# And only rotate when they grow larger than 1 GB
+- name: adjust nginx logrotate trigger rolls
+  lineinfile:
+    state: present
+    path: /etc/logrotate.d/nginx
+    regexp: "minsize"
+    line: "minsize 1G"
+    insertafter: "rotate \\d+"
+
+- name: verify nginx isn't serving default pages
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify:
+    - reload nginx
+
+- name: verify nginx proxy cache dir exists
+  file:
+    path: /var/nginx/proxy-cache
+    owner: www-data
+    state: directory
+
+- name: verify nginx cpu affinity
+  lineinfile:
+    state: present
+    path: /etc/nginx/nginx.conf
+    regexp: "^worker_cpu_affinity "
+    line: "worker_cpu_affinity auto;"
+    insertafter: '^worker_processes '
+  notify:
+    - reload nginx
+
+- name: drop keepalive from nginx conf because we set it custom
+  lineinfile:
+    state: absent
+    path: /etc/nginx/nginx.conf
+    regexp: "^\\s+keepalive_timeout"
+  notify:
+    - reload nginx
+
+- name: copy config extensions
+  copy:
+    src: conf.d
+    dest: /etc/nginx/
+  notify:
+    - reload nginx
+
+- name: copy shared tls settings
+  copy:
+    src: tls/
+    dest: /etc/nginx/
+  notify:
+    - reload nginx
+
+- name: generate our templated basic sites
+  template:
+    src: basic-site.conf.j2
+    dest: "/etc/nginx/sites-available/{{ item.domain }}"
+  loop: "{{ nginx.basic }}"
+  notify:
+    - reload nginx
+
+- name: copy our more complex sites we don't want templated
+  copy:
+    src: "servers/{{ item }}"
+    dest: /etc/nginx/sites-available/
+  loop: "{{ nginx.complex }}"
+  notify:
+    - reload nginx
+
+- name: activate our nginx site configs
+  file:
+    src: "/etc/nginx/sites-available/{{ item }}"
+    dest: "/etc/nginx/sites-enabled/{{ item }}"
+    state: link
+  loop: "{{ nginx.complex }}"
+  notify:
+    - reload nginx
+
+- name: activate our nginx site templates
+  file:
+    src: "/etc/nginx/sites-available/{{ item.domain }}"
+    dest: "/etc/nginx/sites-enabled/{{ item.domain }}"
+    state: link
+  loop: "{{ nginx.basic }}"
+  notify:
+    - reload nginx
+
+- name: remove disabled sites
+  file:
+    src: "/etc/nginx/sites-enabled/{{ item }}"
+    state: absent
+  loop: "{{ nginx.disabled | default([]) }}"
+  notify:
+    - reload nginx
+
+- name: reload if certs newish
+  include_role:
+    name: certreload
+  vars:
+    certreload:
+      notifiers:
+        - reload nginx

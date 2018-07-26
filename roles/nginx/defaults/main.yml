@@ -1,0 +1,6 @@
+---
+nginx:
+  # Don't disable anything by default, but provide it here
+  # so you don't need to include empty 'disabled' in your own
+  # host configs.
+  disabled: []

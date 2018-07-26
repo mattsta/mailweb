@@ -1,0 +1,55 @@
+# Test OCSP with:
+# openssl s_client -connect $site:443 -tls1 -tlsextdebug -status
+#
+# also test with:
+# openssl s_client -connect $site:443 -CAfile /etc/ssl/certs/ca-certificates.crt -showcerts -status -tlsextdebug -cipher RSA </dev/null
+#
+# openssl s_client -connect $site:443 -CAfile /etc/ssl/certs/ca-certificates.crt -showcerts -status -tlsextdebug -cipher ECDSA </dev/null
+
+
+# Duration client SSL session tickets are valid for:
+ssl_session_timeout 1d;
+# NOTE NOTE NOTE NOTE NOTE
+# nginx only regenerates its ssl_session_ticket_key on reload or restart.
+# the ticket key is basically a symmetric key that effectively breaks
+# forward secrecy if leaked.
+# With ssl_session_tickets enabled, you should reload nginx daily to reset
+# the internal cached ticket key.
+# If you are using external ticket keys, those should also be rotated daily.
+# END NOTE END NOTE END NOTE
+
+# Internal cache of SSL sessions
+ssl_session_cache shared:SSL:500m; # 500MB = 2M cached sessions (4k sessions/MB)
+
+# session tickets are reused for the life of the server.
+# For multiple servers serving the same host,
+# have them all share the same key and rotate as necessary:
+# ssl_session_ticket_key [keyfile];
+# Without a ticket key file defined, a reload of nginx resets the key.
+ssl_session_tickets on;
+
+# Individual cipher files are included externally
+# (one of ssl_ciphers_{intermediate,modern})
+ssl_prefer_server_ciphers on;
+
+# HSTS (ngx_http_headers_module is required) (15768000 seconds = 6 months)
+add_header Strict-Transport-Security "max-age=15768000; includeSubdomains";
+
+# OCSP Stapling ---
+# fetch OCSP records from URL in ssl_certificate and cache them
+ssl_stapling on;
+ssl_stapling_verify on;
+
+# See: https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_trusted_certificate
+ssl_trusted_certificate /etc/ssl/lets-encrypt-x3-cross-signed.pem;
+
+# Instead of using resolver, take response from file:
+# ssl_stapling_file <-- must be set PER domain, but nginx so far has refused
+# to add the ability to have one stapling file per certificate now that nginx
+# supports both RSA and EC per domain. So, this is useless if you have multiple
+# certificates per domain.
+
+# 'valid' ignores DNS TTL and caches lookups for specified duration
+# This should be replaced with a local dnsmasq resolver at 127.0.0.1
+resolver 127.0.0.53 4.2.2.2 8.8.8.8 1.1.1.1 valid=600s ipv6=off;
+resolver_timeout 4s;
