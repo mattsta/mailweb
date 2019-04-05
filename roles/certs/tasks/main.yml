@@ -23,7 +23,7 @@
 
 #- name: allow certmaint to maint certs and keys (default)
 #  acl:
-#    path: /etc/ssl/
+#    path: /etc/ssl/certs/
 #    etype: user
 #    entity: certmaint
 #    permissions: rw
@@ -34,7 +34,7 @@
 
 #- name: allow certmaint to maint certs and keys (actual certs)
 #  acl:
-#    path: /etc/ssl/
+#    path: /etc/ssl/certs/
 #    etype: user
 #    entity: certmaint
 #    permissions: rwx
@@ -67,7 +67,7 @@
 - name: populate required certs (common types)
   copy:
     src: "tls/{{ item[0] }}-cert-combined.{{ item[1] }}.pem"
-    dest: /etc/ssl/
+    dest: /etc/ssl/certs/
     mode: 0644
     owner: certmaint
   loop: "{{ certs.required |product(certs.keyTypes) |list }}"
@@ -91,7 +91,7 @@
 - name: populate required certs (specific types)
   copy:
     src: "tls/{{ item.host }}-cert-combined.{{ item.type }}.pem"
-    dest: /etc/ssl/
+    dest: /etc/ssl/certs/
     mode: 0644
     owner: certmaint
   loop: "{{ certs.required }}"
@@ -102,7 +102,7 @@
 - name: plop LE cert chain
   copy:
     src: "tls/lets-encrypt-x3-cross-signed.pem"
-    dest: /etc/ssl/
+    dest: /etc/ssl/certs/
     mode: 0644
     owner: certmaint
 
