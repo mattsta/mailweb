@@ -19,7 +19,7 @@ myhostname = {{ network.hostname.public }}
 # virtual domains, which are configured below. Make sure to specify the FQDN
 # of your sever, as well as localhost.
 # Note: NEVER specify any virtual domains here!!! Those come later.
-mydestination = localhost
+mydestination = localhost, $myhostname
 
 # Domain appended to mail sent locally from this machine - such as mail sent
 # via the `sendmail` command.
