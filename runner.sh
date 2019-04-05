@@ -23,7 +23,7 @@ EXTRA_VARS="ansible_python_interpreter=/usr/bin/python3"
 # --user=vagrant
 # --connection=ssh
 # --limit='machine1'
-# --inventory-file=/inventory/vagrant_ansible_inventory
+# --inventory=/inventory/vagrant_ansible_inventory
 # playbook.yml
 
 # "debug" below formats output as properly indented/pretty printed.
