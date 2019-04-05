@@ -208,6 +208,7 @@
 - name: install system tools
   apt:
     pkg:
+      - aptitude
       # acl is required for ansible to "become_user" as someone non-root because
       # of permissions on its temporary files. Ansible will setfacl on temp files
       # so it doesn't have to 0666 everything just so a new user can modify things.
