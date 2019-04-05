@@ -2,13 +2,13 @@
 ssl = required
 
 # Config detials at https://wiki.dovecot.org/SSL/DovecotConfiguration
-ssl_cert = </etc/ssl/{{ network.hostname.public }}-cert-combined.rsa2048.pem
+ssl_cert = </etc/ssl/certs/{{ network.hostname.public }}-cert-combined.rsa2048.pem
 ssl_key = </etc/ssl/private/{{ network.hostname.public }}-key.rsa2048.pem
 
 # Since v2.2.31+ you can specify alternative ssl certificate
 # if the algorithm differs from the primary certificate.
 # This is useful when migrating to e.g. ECDSA certificate.
-ssl_alt_cert = </etc/ssl/{{ network.hostname.public }}-cert-combined.prime256v1.pem
+ssl_alt_cert = </etc/ssl/certs/{{ network.hostname.public }}-cert-combined.prime256v1.pem
 ssl_alt_key = </etc/ssl/private/{{ network.hostname.public }}-key.prime256v1.pem
 
 # require modern crypto - taken from Mozilla's SSL recommendations page
