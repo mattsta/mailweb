@@ -71,7 +71,7 @@ driver = sqlite
 #   connect = host=sql.example.com dbname=virtual user=virtual password=blarg
 #   connect = /etc/dovecot/authdb.sqlite
 #
-connect = /etc/dovecot/authdb.sqlite
+connect = /var/mail/sqlite/authdb.sqlite3
 
 # Default password scheme.
 #

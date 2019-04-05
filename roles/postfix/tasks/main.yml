@@ -6,6 +6,7 @@
     state: latest
     pkg:
       - postfix
+      - postfix-sqlite
       - postfix-doc
       - postfix-pcre
 

@@ -1,0 +1,2 @@
+dbpath = /var/mail/sqlite/authdb.sqlite3
+query = SELECT domain FROM users WHERE domain = '%s'
