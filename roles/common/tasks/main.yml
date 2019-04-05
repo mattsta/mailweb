@@ -286,7 +286,7 @@
 #
 #- name: install ohai
 #  apt:
-#    pkg: facter
+#    pkg: ohai
 #    state: latest
 
 
