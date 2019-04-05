@@ -11,7 +11,7 @@
     state: present
 
 # rspamd install and configuration
-- name: install shitdis
+- name: install redis
   apt:
     pkg: redis
     state: latest
@@ -24,7 +24,7 @@
     mode: 0700
     state: directory
 
-- name: copy poodis config
+- name: copy redis config
   copy:
     src: redis/
     dest: /etc/redis/
