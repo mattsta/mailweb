@@ -9,6 +9,7 @@ GROUP_PLAYBOOK=$1
 INVENTORY="$here/inventory/inventory"
 ANSIBLE_STDOUT_CALLBACK=debug
 PYTHONUNBUFFERED=1
+EXTRA_VARS="ansible_python_interpreter=/usr/bin/python3"
 
 # More debug options from ansible docs about auto-provisioning...
 # (mostly disables built-in checks and overrides some defaults)
@@ -40,4 +41,4 @@ PYTHONUNBUFFERED=1
 ansible-playbook -v --inventory $INVENTORY \
     -l $GROUP_PLAYBOOK \
     "$here/$GROUP_PLAYBOOK.yml" \
-    --ask-pass --ask-become-pass
+    --ask-pass --ask-become-pass --extra-vars=$EXTRA_VARS
