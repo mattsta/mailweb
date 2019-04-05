@@ -8,6 +8,7 @@
     - network
     - disableFirewall
     - rspamd
+    - sqlite
     - dovecot
     - sieve
     - postfix

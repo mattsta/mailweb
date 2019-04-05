@@ -1,0 +1,12 @@
+# roles/sqlite/defaults/main.yml
+---
+sqlite_directory: /var/mail/sqlite
+sqlite_user: vmail
+sqlite_group: vmail
+sqlite_databases: [authdb]
+authdb_email: 'postmaster'
+authdb_alias: 'info'
+authdb_userid: 'info'
+authdb_domain: 'server.com'
+authdb_password: ''
+...

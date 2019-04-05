@@ -1,0 +1,43 @@
+# roles/sqlite/tasks/main.yml
+---
+- name: install SQLite
+  apt:
+    state: latest
+    pkg:
+      - sqlite3
+
+- name: create SQLite directory
+  file:
+    path: "{{ sqlite_directory }}"
+    owner: "{{ sqlite_user }}"
+    group: "{{ sqlite_group }}"
+    mode: 0755
+    state: directory
+
+- template:
+    src: "{{ item }}.sql.j2"
+    dest: "{{ sqlite_directory }}/{{ item }}.sql"
+    owner: "{{ sqlite_user }}"
+    group: "{{ sqlite_group }}"
+  with_items: "{{ sqlite_databases }}"
+
+- name: create and insert data into SQLite databases
+  shell: |
+    FILE="{{ sqlite_directory }}/{{ item }}.sqlite3"
+    if [ -f $FILE ]; then
+      # A database with the same name exists, so skipping
+      rm "{{ sqlite_directory }}/{{ item }}.sql"
+    else
+      cat "{{ sqlite_directory }}/{{ item }}.sql" | sqlite3 "{{ sqlite_directory }}/{{ item }}.sqlite3";
+      rm "{{ sqlite_directory }}/{{ item }}.sql"
+    fi
+  with_items: "{{ sqlite_databases }}"
+
+- name: fix user permissions on authdb
+  file:
+    path: "{{ sqlite_directory }}/{{ item }}.sqlite3"
+    owner: vmail
+    group: vmail
+    mode: 0600
+  with_items: "{{ sqlite_databases }}"
+...

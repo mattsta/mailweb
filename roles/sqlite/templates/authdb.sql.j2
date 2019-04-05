@@ -1,0 +1,7 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE users (userid NOT NULL, domain NOT NULL, password NOT NULL);
+INSERT INTO users (userid,domain,password) VALUES ('{{ authdb_userid }}', '{{ authdb_domain }}', '{{ authdb_password }}');
+CREATE TABLE aliases (id NOT NULL, email NOT NULL, alias NOT NULL);
+INSERT INTO aliases (email,alias) VALUES ('{{ authdb_email }}@{{ authdb_domain }}','{{ authdb_alias }}@{{ authdb_domain }}');
+COMMIT;

@@ -11,6 +11,7 @@ my personal mail infrastructure components including:
 - rspamd
 - borg-backup
 - fail2ban
+- sqlite
 
 Also includes web components for installing multi-site `nginx` servers.
 
