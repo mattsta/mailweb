@@ -38,7 +38,7 @@ EXTRA_VARS="ansible_python_interpreter=/usr/bin/python3"
 # e.g. if your host name is "webby" and you test playbook "web",
 #      that's a valid prefix match ("web" is a prefix of "webby")
 #      or, you can use direct names: deploy to mailmash using mailmash.yml
-ansible-playbook -v --inventory $INVENTORY \
+ansible-playbook --verbose --inventory $INVENTORY \
     -l $GROUP_PLAYBOOK \
     "$here/$GROUP_PLAYBOOK.yml" \
     --ask-pass --ask-become-pass --extra-vars=$EXTRA_VARS
