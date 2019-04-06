@@ -12,8 +12,8 @@ network:
     # network.hostname.public is used populate templates with
     # server's public hostname, including:
     #   - TLS certs to use with this pattern:
-    #     /etc/ssl/[hostname]-cert-combined.pem
-    #     /etc/ssl/[hostname]-key.pem
+    #     /etc/ssl/certs/[hostname]-cert-combined.pem
+    #     /etc/ssl/certs/[hostname]-key.pem
     #   - Postfix config parameter "myhostname"
     public: yourmail.server.com
 
