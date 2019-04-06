@@ -1,8 +1,0 @@
-# roles/sqlite/defaults/main.yml
----
-authdb_email: 'postmaster'
-authdb_alias: 'info'
-authdb_userid: 'info'
-authdb_domain: 'server.com'
-authdb_password: ''
-...

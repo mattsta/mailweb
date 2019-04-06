@@ -1,0 +1,6 @@
+authdb:
+  userid: 'info'
+  domain: 'server.com'
+  password: ''
+  email: 'postmaster'
+  alias: 'info'
