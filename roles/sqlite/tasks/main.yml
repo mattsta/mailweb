@@ -9,16 +9,16 @@
 - name: create SQLite directory
   file:
     path: "{{ sqlite_directory }}"
-    owner: "{{ sqlite_user }}"
-    group: "{{ sqlite_group }}"
+    owner: vmail
+    group: vmail
     mode: 0755
     state: directory
 
 - template:
     src: "{{ item }}.sql.j2"
     dest: "{{ sqlite_directory }}/{{ item }}.sql"
-    owner: "{{ sqlite_user }}"
-    group: "{{ sqlite_group }}"
+    owner: vmail
+    group: vmail
   with_items: "{{ sqlite_databases }}"
 
 - name: create and insert data into SQLite databases
