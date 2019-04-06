@@ -1,7 +1,5 @@
 # roles/sqlite/defaults/main.yml
 ---
-sqlite_directory: /var/mail/sqlite
-sqlite_databases: [authdb]
 authdb_email: 'postmaster'
 authdb_alias: 'info'
 authdb_userid: 'info'
