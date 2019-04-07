@@ -2,6 +2,7 @@
 authdb:
   userid: 'info'
   domain: 'server.com'
+  # Generate password with: doveadm pw -s SHA512-CRYPT
   password: 'HASHED_PASSWORD'
   email: 'postmaster'
   alias: 'info'
