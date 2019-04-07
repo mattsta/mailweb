@@ -2,6 +2,6 @@
 authdb:
   userid: 'info'
   domain: 'server.com'
-  password: ''
+  password: 'HASHED_PASSWORD'
   email: 'postmaster'
   alias: 'info'
