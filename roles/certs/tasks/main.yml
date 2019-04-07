@@ -101,7 +101,7 @@
 
 - name: plop LE cert chain
   copy:
-    src: "tls/lets-encrypt-x3-cross-signed.pem"
+    src: "lets-encrypt-x3-cross-signed.pem"
     dest: /etc/ssl/certs/
     mode: 0644
     owner: certmaint
