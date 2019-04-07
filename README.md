@@ -44,6 +44,17 @@ into the public repository (only commit on local internal branches). This is hel
 by our `.gitignore` in the public branch. View comments in `.gitignore` for more details
 about private usage.
 
+## SQLite
+
+Each user must have a password. It is always a good practice to hash passwords stored in a database, in case the database is compromised. If a user's password is MY_PASSWORD, you can hash it using Dovecot's password hash generator:
+
+```console
+$ doveadm pw -s SSHA512
+Enter new password:MY_PASSWORD
+Retype new password:MY_PASSWORD
+{SSHA512}HASHED_PASSWORD
+```
+Next edit sqlite.yml, and replace HASHED_PASSWORD with the exact output of the command.
 
 ## Contributing
 
