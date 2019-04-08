@@ -1,0 +1,26 @@
+---
+packages:
+  required:
+    - aptitude
+    # acl is required for ansible to "become_user" as someone non-root because
+    # of permissions on its temporary files. Ansible will setfacl on temp files
+    # so it doesn't have to 0666 everything just so a new user can modify things.
+    - acl
+    # you aren't a linux server without sending nightly summary emails
+    - logwatch
+    # apt helpers for repo installs not included by default for some reason
+    - software-properties-common
+    # production CA bundles so we don't get unknown CA errors
+    - ca-certificates
+    # Maintains high numbers in /proc/sys/kernel/random/entropy_avail
+    - rng-tools
+    # should we use a more modern thing than collect? distributed osquery?
+    - collectd
+    # make sure 'install_recommends: no' or this installs lots of other stuff
+    - vim-nox
+    # rrdtool only installed so we can be lazy and generate graphs on-demand
+    # with: /usr/share/doc/collectd-core/examples/collectd2html.pl
+    # TODO: enable centralized reporting system
+    - rrdtool
+    # netstat, mii-tool, etc
+    - net-tools
