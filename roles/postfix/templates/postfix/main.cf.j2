@@ -181,7 +181,6 @@ smtpd_recipient_restrictions =
 # deliver mail for virtual users to Dovecot's LMTP socket
 # TODO: convert this to network with dovecot opening a local inet port
 alias_maps = hash:/etc/postfix/aliases
-alias_database = hash:/etc/postfix/aliases
 virtual_mailbox_base = /etc/postfix/virtual
 virtual_transport = lmtp:unix:private/dovecot-lmtp
 virtual_mailbox_domains = sqlite:/etc/postfix/sqlite_domains.cf
