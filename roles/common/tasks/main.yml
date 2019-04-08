@@ -1,7 +1,7 @@
 ---
 # You can manually view how your OS-provided packages are supported with:
 # ubuntu-support-status --show-all
-- name: update packages
+- name: upgrade packages
   apt:
     update_cache: yes
     upgrade: safe
@@ -268,7 +268,7 @@
 #
 #- name: install ohai
 #  apt:
-#    pkg: facter
+#    pkg: ohai
 #    state: latest
 
 
