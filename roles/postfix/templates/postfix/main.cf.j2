@@ -48,11 +48,11 @@ swap_bangpath = no
 recipient_delimiter = +
 
 # path to the SSL certificate for the mail server
-smtpd_tls_cert_file = /etc/ssl/{{ network.hostname.public }}-cert-combined.rsa2048.pem
+smtpd_tls_cert_file = /etc/ssl/certs/{{ network.hostname.public }}-cert-combined.rsa2048.pem
 smtpd_tls_key_file = /etc/ssl/private/{{ network.hostname.public }}-key.rsa2048.pem
 
 # You can also specify an EC cert to try first if the clients support it.
-smtpd_tls_eccert_file = /etc/ssl/{{ network.hostname.public }}-cert-combined.prime256v1.pem
+smtpd_tls_eccert_file = /etc/ssl/certs/{{ network.hostname.public }}-cert-combined.prime256v1.pem
 smtpd_tls_eckey_file = /etc/ssl/private/{{ network.hostname.public }}-key.prime256v1.pem
 
 # Path to your trusted certificates file. Usually provided by a
@@ -93,7 +93,7 @@ smtpd_tls_security_level = may
 tls_ssl_options = no_ticket, no_compression
 
 # yes, using 2048 with "dh1024" is the right thing to do
-smtpd_tls_dh1024_param_file = /etc/ssl/ffdhe2048.pem
+smtpd_tls_dh1024_param_file = /etc/ssl/certs/ffdhe2048.pem
 
 # cache incoming and outgoing TLS sessions
 smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_tlscache

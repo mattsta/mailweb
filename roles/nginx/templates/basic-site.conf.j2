@@ -18,12 +18,12 @@ server {
   include /etc/nginx/ssl_ciphers_intermediate;
 {% endif %}
 
-  ssl_certificate     /etc/ssl/{{ item.domain }}-cert-combined.rsa2048.pem;
+  ssl_certificate     /etc/ssl/certs/{{ item.domain }}-cert-combined.rsa2048.pem;
   ssl_certificate_key /etc/ssl/private/{{ item.domain }}-key.rsa2048.pem;
 
   # nginx >= 1.11.0 (2016-05-24) allows loading redundant certs and keys so you
   # can serve modern EC clients and less modern RSA clients at the same time.
-  ssl_certificate     /etc/ssl/{{ item.domain }}-cert-combined.prime256v1.pem;
+  ssl_certificate     /etc/ssl/certs/{{ item.domain }}-cert-combined.prime256v1.pem;
   ssl_certificate_key /etc/ssl/private/{{ item.domain }}-key.prime256v1.pem;
 
   root   /srv/web/{{ item.domain }};

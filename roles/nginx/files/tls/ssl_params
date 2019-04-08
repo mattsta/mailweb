@@ -41,7 +41,7 @@ ssl_stapling on;
 ssl_stapling_verify on;
 
 # See: https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_trusted_certificate
-ssl_trusted_certificate /etc/ssl/lets-encrypt-x3-cross-signed.pem;
+ssl_trusted_certificate /etc/ssl/certs/lets-encrypt-x3-cross-signed.pem;
 
 # Instead of using resolver, take response from file:
 # ssl_stapling_file <-- must be set PER domain, but nginx so far has refused

@@ -61,7 +61,7 @@
 - name: populate known-good dhparams
   copy:
     src: "{{ item }}"
-    dest: "/etc/ssl/{{ item }}"
+    dest: "/etc/ssl/certs/{{ item }}"
   loop:
     - ffdhe2048.pem
     - ffdhe3072.pem
