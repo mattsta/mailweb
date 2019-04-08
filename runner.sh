@@ -7,6 +7,9 @@ here=$(dirname $0)
 
 GROUP_PLAYBOOK=$1
 INVENTORY="$here/inventory/inventory"
+ANSIBLE_STDOUT_CALLBACK=debug
+PYTHONUNBUFFERED=1
+EXTRA_VARS="ansible_python_interpreter=/usr/bin/python3"
 
 # More debug options from ansible docs about auto-provisioning...
 # (mostly disables built-in checks and overrides some defaults)
@@ -20,7 +23,7 @@ INVENTORY="$here/inventory/inventory"
 # --user=vagrant
 # --connection=ssh
 # --limit='machine1'
-# --inventory-file=/inventory/vagrant_ansible_inventory
+# --inventory=/inventory/vagrant_ansible_inventory
 # playbook.yml
 
 # "debug" below formats output as properly indented/pretty printed.
@@ -35,7 +38,7 @@ INVENTORY="$here/inventory/inventory"
 # e.g. if your host name is "webby" and you test playbook "web",
 #      that's a valid prefix match ("web" is a prefix of "webby")
 #      or, you can use direct names: deploy to mailmash using mailmash.yml
-ANSIBLE_STDOUT_CALLBACK=debug PYTHONUNBUFFERED=1 ansible-playbook -v --inventory $INVENTORY \
+ansible-playbook --verbose --inventory $INVENTORY \
     -l $GROUP_PLAYBOOK \
     "$here/$GROUP_PLAYBOOK.yml" \
-    --ask-pass --ask-become-pass
+    --ask-pass --ask-become-pass --extra-vars=$EXTRA_VARS
