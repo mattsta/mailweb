@@ -58,19 +58,6 @@
   - resieve spam mover
   - restart dovecot
 
-# This permission is important because dovecot has multiple users:
-# - dovecot
-# - dovenull
-# - vmail
-# but login processes are run by the 'vmail' user, so 'vmail' must have read
-# access to the DB
-- name: fix user permissions on authdb
-  file:
-    path: /etc/dovecot/authdb.sqlite
-    owner: vmail
-    group: vmail
-    mode: 0600
-
 - name: instantiate dovecot SSL template with host vars
   template:
     src: dovecot/conf.d/10-ssl.conf.j2

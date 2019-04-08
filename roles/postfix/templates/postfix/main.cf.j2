@@ -180,10 +180,12 @@ smtpd_recipient_restrictions =
 
 # deliver mail for virtual users to Dovecot's LMTP socket
 # TODO: convert this to network with dovecot opening a local inet port
+alias_maps = hash:/etc/postfix/aliases
+virtual_mailbox_base = /etc/postfix/virtual
 virtual_transport = lmtp:unix:private/dovecot-lmtp
-virtual_mailbox_domains = /etc/postfix/domains
-
-virtual_alias_maps = hash:/etc/postfix/virtual
+virtual_mailbox_domains = sqlite:/etc/postfix/sqlite_domains.cf
+virtual_mailbox_maps = sqlite:/etc/postfix/sqlite_mailbox.cf
+virtual_alias_maps = sqlite:/etc/postfix/sqlite_alias.cf
 #virtual_alias_domains = /etc/postfix/domains
 
 # We'll uncomment these when we set up rspamd later:

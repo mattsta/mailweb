@@ -1,0 +1,40 @@
+# roles/sqlite/tasks/main.yml
+---
+- name: install SQLite
+  apt:
+    state: latest
+    pkg:
+      - sqlite3
+
+- name: create SQLite directory
+  file:
+    path: "/var/mail/sqlite"
+    owner: vmail
+    group: vmail
+    mode: 0755
+    state: directory
+
+- template:
+    src: "authdb.sql.j2"
+    dest: "/var/mail/sqlite/authdb.sql"
+    owner: vmail
+    group: vmail
+
+- name: create and insert data into SQLite databases
+  shell: |
+    FILE="/var/mail/sqlite/authdb.sqlite3"
+    if [ -f $FILE ]; then
+      # A database with the same name exists, so skipping
+      rm "/var/mail/sqlite/authdb.sql"
+    else
+      cat "/var/mail/sqlite/authdb.sql" | sqlite3 "/var/mail/sqlite/authdb.sqlite3";
+      rm "/var/mail/sqlite/authdb.sql"
+    fi
+
+- name: fix user permissions on authdb
+  file:
+    path: "/var/mail/sqlite/authdb.sqlite3"
+    owner: vmail
+    group: vmail
+    mode: 0600
+...

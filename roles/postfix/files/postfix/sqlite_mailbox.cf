@@ -1,0 +1,3 @@
+dbpath = /var/mail/sqlite/authdb.sqlite3
+query = SELECT userid || '@' || domain AS email FROM users WHERE email = '%s'
+result_format = %d/%u/

@@ -2,7 +2,7 @@
 
 here=$(dirname $0)
 
-MAPS="virtual"
+MAPS="aliases virtual"
 
 for map in $MAPS; do
   postmap $here/$map

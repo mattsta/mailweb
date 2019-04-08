@@ -71,7 +71,7 @@ driver = sqlite
 #   connect = host=sql.example.com dbname=virtual user=virtual password=blarg
 #   connect = /etc/dovecot/authdb.sqlite
 #
-connect = /etc/dovecot/authdb.sqlite
+connect = /var/mail/sqlite/authdb.sqlite3
 
 # Default password scheme.
 #
@@ -138,10 +138,10 @@ user_query = \
 # userdb prefetch instead of userdb sql in dovecot.conf. In that case you'll
 # also have to return userdb fields in password_query prefixed with "userdb_"
 # string. For example:
-password_query = \
-  SELECT '%u' AS user, password, \
-     "/var/mail/vhosts/" || '%d' || '/' || '%n' AS userdb_home, 145 AS userdb_uid, 145 AS userdb_gid \
-  FROM users WHERE userid = '%n' AND domain = '%d'
+#password_query = \
+#  SELECT '%u' AS user, password, \
+#     "/var/mail/vhosts/" || '%d' || '/' || '%n' AS userdb_home, 145 AS userdb_uid, 145 AS userdb_gid \
+#  FROM users WHERE userid = '%n' AND domain = '%d'
 
 # Query to get a list of all usernames.
 # This iteration is used for things like globally purging zero refcount emails

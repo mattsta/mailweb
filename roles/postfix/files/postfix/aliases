@@ -1,0 +1,5 @@
+mailer-daemon: root
+# postmaster: root
+hostmaster: root
+webmaster: root
+abuse: root
