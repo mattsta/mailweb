@@ -24,6 +24,17 @@
     group: root
     mode: 0644
 
+- name: create required dir structure for systemd getty
+  file:
+    dest: /etc/systemd/system/getty@tty1.service.d/
+    state: directory
+- name: configure override remove the clear screen before login
+  copy:
+    src: override.conf
+    dest: "/etc/systemd/system/getty@tty1.service.d/"
+    owner: root
+    group: root
+    mode: 0644
 
 - include_role:
     name: ramdisk
