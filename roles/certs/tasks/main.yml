@@ -61,7 +61,6 @@
   loop: "{{ certs.required |product(certs.keyTypes) |list }}"
   when: certs.required[0] is string
 
-
 # Certs are owned by 'certmaint' so user 'certmaint' can update them over scp
 # Certs are public (obviously)
 - name: populate required certs (common types)
@@ -72,8 +71,6 @@
     owner: certmaint
   loop: "{{ certs.required |product(certs.keyTypes) |list }}"
   when: certs.required[0] is string
-
-
 
 # Keys are private: only owner can read/write, and only group can read
 - name: populate required keys (specific types)
@@ -97,8 +94,6 @@
   loop: "{{ certs.required }}"
   when: certs.required[0] is mapping
 
-
-
 - name: plop LE cert chain
   copy:
     src: "tls/lets-encrypt-x3-cross-signed.pem"
@@ -113,7 +108,6 @@
     mode: 0755
   when:
     - certs.receiver is defined and certs.receiver
-
 
 # Retrieve all users on this host (creates variable 'passwd' containing results)
 - name: get all user details so we can populate home directories

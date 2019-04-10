@@ -26,7 +26,7 @@
       # A database with the same name exists, so skipping
       rm "/var/mail/sqlite/authdb.sql"
     else
-      cat "/var/mail/sqlite/authdb.sql" | sqlite3 "/var/mail/sqlite/authdb.sqlite3";
+      cat "/var/mail/sqlite/authdb.sql" | sqlite3 "/var/mail/sqlite/authdb.sqlite3"
       rm "/var/mail/sqlite/authdb.sql"
     fi
 
@@ -36,4 +36,3 @@
     owner: vmail
     group: vmail
     mode: 0600
-...

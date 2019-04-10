@@ -4,12 +4,12 @@
 #    src: "{{ inventory_hostname }}.yaml"
 #    dest: "/etc/netplan/20-customNetworking.yaml"
 #  register: netplanCopy
-#
+
 #- name: generate netplan
 #  command: netplan generate
 #  register: netplanGenerated
 #  when: netplanCopy.changed
-#
+
 #- name: apply netplan
 #  command: netplan apply
 #  when: netplanGenerated.changed

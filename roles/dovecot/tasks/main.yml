@@ -78,7 +78,6 @@
     job: "doveadm purge -A"
     cron_file: dovecot_maint_purge
 
-
 # verify everything is running
 - name: verify services are running in dependency order
   service:

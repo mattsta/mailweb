@@ -29,7 +29,7 @@ to isolate non-public content from role directories.
 
 For example: to avoid committing our private keys to the public repository,
 instead of putting keys in a subdirectory of the role itself (e.g. `./roles/certs/files/tls/site-key.pem`),
-we place them at the top level `file` path Ansible also searches (e.g. `./files/certs/tls/site-key.pem`).
+we place them at the top level `files` path Ansible also searches (e.g. `./files/certs/tls/site-key.pem`).
 
 The same goes for `hosts_vars` and `group_vars` using this insight from the
 [Ansible docs](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#splitting-out-host-and-group-specific-data):

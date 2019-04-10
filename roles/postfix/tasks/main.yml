@@ -32,7 +32,6 @@
   notify:
   - reload postfix
 
-
 # verify everything is running
 - name: verify services are running in dependency order
   service:

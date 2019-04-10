@@ -18,7 +18,6 @@
       - "{{ packages.required }}"
       - "{{ packages.optional }}"
 
-
 - name: fix inputrc
   copy:
     src: inputrc
@@ -39,6 +38,7 @@
   file:
     dest: /etc/systemd/system/getty@tty1.service.d/
     state: directory
+
 - name: configure override remove the clear screen before login
   copy:
     src: override.conf
@@ -50,12 +50,10 @@
 - include_role:
     name: ramdisk
 
-
 - name: remove ubuntu call home reporting cron
   cron:
     cron_file: popularity-contest
     state: absent
-
 
 - name: remove low port restriction
   sysctl:
@@ -63,7 +61,6 @@
     value: 0
     state: present
     sysctl_set: yes
-
 
 # 3 means enable for outgoing and incoming connections
 # 2 means enable for incoming connections
@@ -77,7 +74,6 @@
     state: present
     sysctl_set: yes
 
-
 # These were taken from:
 # https://wiki.mozilla.org/Security/Server_Side_TLS#Pre-defined_DHE_groups
 - name: populate known-good dhparams
@@ -89,20 +85,18 @@
     - ffdhe3072.pem
     - ffdhe4096.pem
 
-
 - name: configure /etc/hostname
   hostname:
     name: "{{ inventory_hostname }}"
 
-    #- name: Add IP address of all hosts to all hosts
-    #  lineinfile:
-    #    state: present
-    #    dest: /etc/hosts
-    #    regexp: '.*{{ item }}$'
-    #    line: "{{ hostvars[item].ansible_default_ipv4.address }} {{item}}"
-    #  when: hostvars[item].ansible_default_ipv4.address is defined
-    #  with_items: "{{ groups['all'] }}"
-
+#- name: Add IP address of all hosts to all hosts
+#  lineinfile:
+#    state: present
+#    dest: /etc/hosts
+#    regexp: '.*{{ item }}$'
+#    line: "{{ hostvars[item].ansible_default_ipv4.address }} {{item}}"
+#  when: hostvars[item].ansible_default_ipv4.address is defined
+#  with_items: "{{ groups['all'] }}"
 
 - name: configure sshd to only listen on IPv4
   lineinfile:
@@ -112,14 +106,12 @@
     state: present
   notify: reload sshd
 
-
-  # Capture example:
-  #- replace:
-  #    path: /etc/hosts
-  #    regexp: '(\s+)old\.host\.name(\s+.*)?$'
-  #    replace: '\1new.host.name\2'
-  #    backup: yes
-
+# Capture example:
+#- replace:
+#    path: /etc/hosts
+#    regexp: '(\s+)old\.host\.name(\s+.*)?$'
+#    replace: '\1new.host.name\2'
+#    backup: yes
 
 - name: fix motd
   replace:
@@ -128,7 +120,6 @@
     replace: 'https://matt.sh/motd'
   notify:
     - clear motd cache
-
 
 # Verify against:
 # systemctl list-timers
@@ -142,7 +133,6 @@
     - apt-daily.timer
     - motd-news.timer
 
-
 - name: remove ubuntu self-advertising
   file:
     path: "/etc/update-motd.d/{{ item }}"
@@ -153,7 +143,6 @@
     - 10-help-text
   notify:
     - clear motd cache
-
 
 # Ubuntu's pam_motd.so shows you /etc/legal
 # on login if you don't have ~/.cache/motd.legal-displayed
@@ -215,7 +204,6 @@
     state: present
   notify: reload grub
 
-
 # This is an ops opinion. For more advanced needs, modify here or just template
 # the entire sshd_config directly.
 - name: configure sshd to only listen on local IP
@@ -225,7 +213,6 @@
     line: "ListenAddress {{ hostvars[inventory_hostname]['ansible_' + network.interface.private]['ipv4']['address'] }}"
     state: present
   notify: reload sshd
-
 
 # use a modern ntp client+server.
 #
@@ -273,7 +260,6 @@
 #  apt:
 #    pkg: ohai
 #    state: latest
-
 
 # cleanup
 - name: cleanup packaging
