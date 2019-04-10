@@ -7,6 +7,17 @@
     upgrade: safe
     cache_valid_time: 3600
 
+# Check packages.yml inside host_vars for details
+- name: install required and optional packages
+  apt:
+    pkg:
+      name: "{{ item }}"
+      install_recommends: no
+      state: latest
+    with_items:
+      - "{{ packages.required }}"
+      - "{{ packages.optional }}"
+
 
 - name: fix inputrc
   copy:
@@ -215,14 +226,6 @@
     state: present
   notify: reload sshd
 
-
-- name: install required packages
-  apt:
-    pkg:
-      name: "{{ item }}"
-      install_recommends: no
-      state: latest
-    with_items: "{{ packages.required }}"
 
 # use a modern ntp client+server.
 #
