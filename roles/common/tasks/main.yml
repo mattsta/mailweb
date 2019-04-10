@@ -89,6 +89,15 @@
   hostname:
     name: "{{ inventory_hostname }}"
 
+- name: locales preed
+  debconf:
+    name: locales
+    question: locales/default_environment_locale
+    value: en_US.UTF-8
+    vtype: select
+  notify:
+  - dpkg-reconfigure-locales
+
 #- name: Add IP address of all hosts to all hosts
 #  lineinfile:
 #    state: present
