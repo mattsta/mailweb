@@ -8,15 +8,21 @@
     cache_valid_time: 3600
 
 # Check packages.yml inside host_vars for details
-- name: install required and optional packages
+- name: install required packages
   apt:
     pkg:
       name: "{{ item }}"
       install_recommends: no
       state: latest
-    with_items:
-      - "{{ packages.required }}"
-      - "{{ packages.optional }}"
+    with_items: "{{ packages.required }}"
+
+- name: install optional packages
+  apt:
+    pkg:
+      name: "{{ item }}"
+      install_recommends: no
+      state: latest
+    with_items: "{{ packages.optional }}"
 
 - name: fix inputrc
   copy:
