@@ -2,5 +2,5 @@
 # pip3 because borgmatic is distributed through pip3, not apt/dpkg
 - name: install pip3
   apt:
-    pkg: python3-pip
+    name: 'python3-pip'
     state: latest

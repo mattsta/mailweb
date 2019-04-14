@@ -4,7 +4,7 @@
 # dovecot[<pid>]: imap-login: access(tcpwrap): Client refused (rip=<ip>)
 - name: install fail2ban
   apt:
-    name: fail2ban
+    name: 'fail2ban'
     state: latest
     install_recommends: false
 

@@ -1,7 +1,7 @@
 ---
 - name: emerge, nginx with extra modules!
   apt:
-    pkg: nginx-extras
+    name: 'nginx-extras'
     state: latest
 
 # Keep 32 logs

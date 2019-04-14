@@ -1,12 +1,12 @@
 ---
 - name: install borgbackup
   apt:
-    pkg: borgbackup
+    name: 'borgbackup'
     state: latest
 
 - name: install borgmatic
   pip:
-    name: borgmatic
+    name: 'borgmatic'
     state: latest
 
 - name: create backup config dir

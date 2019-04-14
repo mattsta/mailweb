@@ -10,19 +10,17 @@
 # Check packages.yml inside host_vars for details
 - name: install required packages
   apt:
-    pkg:
-      name: "{{ item }}"
-      install_recommends: no
-      state: latest
-    with_items: "{{ packages.required }}"
+    name: "{{ item }}"
+    install_recommends: no
+    state: latest
+  with_items: "{{ packages.required }}"
 
 - name: install optional packages
   apt:
-    pkg:
-      name: "{{ item }}"
-      install_recommends: no
-      state: latest
-    with_items: "{{ packages.optional }}"
+    name: "{{ item }}"
+    install_recommends: no
+    state: latest
+  with_items: "{{ packages.optional }}"
 
 - name: fix inputrc
   copy:
@@ -260,7 +258,7 @@
 # https://chrony.tuxfamily.org/faq.html#_how_do_i_make_an_ntp_server_from_an_ntp_client
 - name: install ntp client
   apt:
-    pkg: chrony
+    name: 'chrony'
     state: latest
   notify:
     - double disable systemd ntp client
@@ -268,12 +266,12 @@
 # If ansible facts aren't enough, we can get puppet and chef facts too:
 #- name: install facter
 #  apt:
-#    pkg: facter
+#    name: 'facter'
 #    state: latest
 #
 #- name: install ohai
 #  apt:
-#    pkg: ohai
+#    name: 'ohai'
 #    state: latest
 
 # cleanup

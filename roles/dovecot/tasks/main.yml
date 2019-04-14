@@ -2,12 +2,13 @@
 # dovecot install and configuration
 - name: install dovecot
   apt:
+    name: "{{ item }}"
     state: latest
-    pkg:
-      - dovecot-imapd
-      - dovecot-lmtpd
-      - dovecot-sieve
-      - dovecot-sqlite
+  with_items:
+    - 'dovecot-imapd'
+    - 'dovecot-lmtpd'
+    - 'dovecot-sieve'
+    - 'dovecot-sqlite'
 
 # Convert existing maildir to mdbox (local on-fs dirs) with:
 # dsync -o mail_location=mdbox:herebox mirror maildir:Maildir

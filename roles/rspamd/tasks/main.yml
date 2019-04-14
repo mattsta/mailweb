@@ -7,13 +7,13 @@
 
 - name: create rspam repo
   apt_repository:
-    repo: deb http://rspamd.com/apt-stable/ bionic main
+    repo: 'deb http://rspamd.com/apt-stable/ bionic main'
     state: present
 
 # rspamd install and configuration
 - name: install redis
   apt:
-    pkg: redis
+    name: 'redis'
     state: latest
 
 - name: set guanodis directory permissions
@@ -33,7 +33,7 @@
 
 - name: install rspamd
   apt:
-    pkg: rspamd
+    name: 'rspamd'
     state: latest
 
 - name: copy rspamd config

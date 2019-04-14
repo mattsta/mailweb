@@ -3,12 +3,13 @@
 # note: this postfix config requires open ports: 25 and 587
 - name: install postfix
   apt:
+    name: "{{ item }}"
     state: latest
-    pkg:
-      - postfix
-      - postfix-sqlite
-      - postfix-doc
-      - postfix-pcre
+  with_items:
+    - 'postfix'
+    - 'postfix-sqlite'
+    - 'postfix-doc'
+    - 'postfix-pcre'
 
 - name: give postfix user permission to read private keys
   user:

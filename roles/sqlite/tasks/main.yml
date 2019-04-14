@@ -1,9 +1,8 @@
 ---
 - name: install SQLite
   apt:
+    name: 'sqlite3'
     state: latest
-    pkg:
-      - sqlite3
 
 - name: create SQLite directory
   file:
