@@ -1,4 +1,7 @@
 ---
+debconf:
+  locales: 'en_US.UTF-8'
+
 packages:
   required:
     # setting locales

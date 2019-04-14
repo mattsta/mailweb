@@ -97,7 +97,7 @@
   debconf:
     name: locales
     question: locales/default_environment_locale
-    value: en_US.UTF-8
+    value: "{{ debconf.locales }}"
     vtype: select
   notify:
   - dpkg-reconfigure-locales
