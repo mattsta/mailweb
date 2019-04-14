@@ -7,7 +7,7 @@
     upgrade: safe
     cache_valid_time: 3600
 
-# Check packages.yml inside host_vars for details
+# Check common.yml inside host_vars for details
 - name: install required packages
   apt:
     name: "{{ item }}"
