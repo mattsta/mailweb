@@ -1,8 +1,8 @@
 [DEFAULT]
 # For 'banaction' you can use any action defined in /etc/fail2ban/action.d/
 # including things like iptables, iptables-ipset, nftables-*, ...
-banaction = hostsdeny
-banaction_allports = hostsdeny
+banaction = iptables-multiport
+banaction_allports = iptables-allports
 
 # Blocking decision making is fully logged in /var/log/fail2ban.log
 # Current blocking can be viewed with:
